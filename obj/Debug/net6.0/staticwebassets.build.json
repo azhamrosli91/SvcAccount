@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "4KOmyXvlbnCMNkbssXsdT1Tr8NeQPUFMNK4YM+gzDbU=",
+  "Source": "SvcAccount",
+  "BasePath": "_content/SvcAccount",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
