@@ -1,4 +1,5 @@
-﻿using SvcAccount.Models;
+﻿
+using libMasterObject;
 
 namespace SvcAccount.Interface
 {

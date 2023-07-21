@@ -33,7 +33,10 @@
 
   <ItemGroup>
     <Reference Include="libMasterLibaryApi">
-      <HintPath>..\..\libMasterLibaryApi\LibaryMasterApi\libMasterLibaryApi\libMasterLibaryApi\bin\Debug\net6.0\libMasterLibaryApi.dll</HintPath>
+      <HintPath>..\..\LibaryMasterApi\LibaryMasterApi\libMasterLibaryApi\libMasterLibaryApi\bin\Debug\net6.0\libMasterLibaryApi.dll</HintPath>
+    </Reference>
+    <Reference Include="libMasterObject">
+      <HintPath>..\..\libMasterObject\libMasterObject\bin\Debug\net6.0\libMasterObject.dll</HintPath>
     </Reference>
   </ItemGroup>
 
