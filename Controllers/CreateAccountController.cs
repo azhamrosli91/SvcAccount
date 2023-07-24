@@ -18,9 +18,10 @@ namespace SvcAccount.Controllers
         private readonly IWebApiCalling _webApiCalling;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
-
+        private readonly RoleManager<IdentityRole> _roleManager;
         public CreateAccountController(ILogger<CreateAccountController> logger, UserManager<User> userManager, 
-            IConfiguration configuration, IHttpClientFactory httpClientFactory, IDbService dbService, IWebApiCalling webApiCalling)
+            IConfiguration configuration, IHttpClientFactory httpClientFactory, IDbService dbService, 
+            IWebApiCalling webApiCalling, RoleManager<IdentityRole>  roleManager)
         {
             _logger = logger;
             _userManager = userManager;
@@ -28,8 +29,48 @@ namespace SvcAccount.Controllers
             _configuration = configuration;
             _dbService = dbService;
             _webApiCalling = webApiCalling;
+            _roleManager = roleManager;
         }
+        [HttpPost("CreateUserRoleAcc", Name = "CreateUserRoleAcc")]
+        public async Task<IActionResult> CreateUserRoleAcc()
+        {
+            string[] roles = { "Admin", "CEO", "Manager", "HR", "User" };
 
+            foreach (var roleName in roles)
+            {
+                // Check if the role already exists
+                if (!await _roleManager.RoleExistsAsync(roleName))
+                {
+                    // If the role doesn't exist, create it
+                    IdentityRole role = new IdentityRole
+                    {
+                        Name = roleName
+                    };
+
+                    // Create the role using RoleManager
+                    IdentityResult result = await _roleManager.CreateAsync(role);
+
+                    if (!result.Succeeded)
+                    {
+                        // Handle the error if the role creation fails
+                        return BadRequest("Error creating roles.");
+                    }
+                }
+            }
+
+            //var user1 = await _userManager.FindByNameAsync("azragreen.order@gmail.com");
+            //if (user1 != null && !await _userManager.IsInRoleAsync(user1, "Admin"))
+            //{
+            //    await _userManager.AddToRoleAsync(user1, "Admin");
+            //}
+            //var user2 = await _userManager.FindByNameAsync("azhamygl@gmail.com");
+            //if (user2 != null && !await _userManager.IsInRoleAsync(user2, "User"))
+            //{
+            //    await _userManager.AddToRoleAsync(user2, "User");
+            //}
+
+            return Ok();
+        }
         [HttpPost("CreateUserAcc", Name = "CreateUserAcc")]
         public async Task<IActionResult> CreateUserAcc([FromBody] USR_User_CreateAcc value)
         {
@@ -44,6 +85,13 @@ namespace SvcAccount.Controllers
             var result = await _userManager.CreateAsync(user, value.Password);
             if (result.Succeeded)
             {
+                //create role as user
+                var user1 = await _userManager.FindByNameAsync(HttpUtility.HtmlEncode(value.Email.Trim()));
+                if (user1 != null && !await _userManager.IsInRoleAsync(user1, "User"))
+                {
+                    await _userManager.AddToRoleAsync(user1, "User");
+                }
+
                 string Query = @"insert into usr_user_details (name, email, " +
                 "phone1,phone1code) VALUES (@name, @email, " +
                 "@phone1,@phone1code) RETURNING userid";

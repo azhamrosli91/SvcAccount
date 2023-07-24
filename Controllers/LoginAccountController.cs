@@ -51,16 +51,23 @@ namespace SvcAccount.Controllers
                 bool result = await _userManager.CheckPasswordAsync(user, value.Password);
                 if (result == true)
                 {
+                    var roles = await _userManager.GetRolesAsync(user);
+
+                    string roleName = roles.FirstOrDefault();
+
+                    if (string.IsNullOrEmpty(roleName)) {
+                        roleName = "User";
+                    }
                     string jsonFormatter = JsonConvert.SerializeObject(user); //JsonConvert.Serialize<User>(user);
                     Claim[] claims = new[]
                     {
                         new Claim(ClaimTypes.Name, user.Email),
                         new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(ClaimTypes.Role, "User"),
+                        new Claim(ClaimTypes.Role, roleName),
                         new Claim(ClaimTypes.Expired, DateTime.Now.AddMinutes(1).ToShortTimeString()),
                     };
 
-                    string token = _jwtToken.GenerateJWTTokenLogin(claims, 20);
+                    string token = _jwtToken.GenerateJWTTokenLogin(claims,30);
 
                     string userName = value.Email;
 
