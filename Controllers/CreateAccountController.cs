@@ -19,9 +19,11 @@ namespace SvcAccount.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IApiURL _apiURL;
+
         public CreateAccountController(ILogger<CreateAccountController> logger, UserManager<User> userManager, 
             IConfiguration configuration, IHttpClientFactory httpClientFactory, IDbService dbService, 
-            IWebApiCalling webApiCalling, RoleManager<IdentityRole>  roleManager)
+            IWebApiCalling webApiCalling, RoleManager<IdentityRole>  roleManager, IApiURL apiURL)
         {
             _logger = logger;
             _userManager = userManager;
@@ -30,6 +32,7 @@ namespace SvcAccount.Controllers
             _dbService = dbService;
             _webApiCalling = webApiCalling;
             _roleManager = roleManager;
+            _apiURL = apiURL;
         }
         [HttpPost("CreateUserRoleAcc", Name = "CreateUserRoleAcc")]
         public async Task<IActionResult> CreateUserRoleAcc()
@@ -111,8 +114,8 @@ namespace SvcAccount.Controllers
                         DateTimeExp = DateTime.Now.AddDays(2),
                     };
 
-                    HttpResponseMessage requestResult = await _webApiCalling.RequestApi(HttpMethod.Post, 
-                        _configuration["ApiURL:EmailVerify"], requestBody, Encoding.UTF8, "application/json");
+                    HttpResponseMessage requestResult = await _webApiCalling.RequestApi(HttpMethod.Post,
+                        await _apiURL.GetApiURL("EmailVerify"), requestBody, Encoding.UTF8, "application/json");
 
                     if (requestResult.IsSuccessStatusCode)
                     {

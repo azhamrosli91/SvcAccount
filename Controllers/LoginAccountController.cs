@@ -20,8 +20,9 @@ namespace SvcAccount.Controllers
         private readonly IWebApiCalling _webApiCalling;
         private readonly IConfiguration _configuration;
         private readonly IDbService _dbService;
+        private readonly IApiURL _apiURL;
         public LoginAccountController(ILogger<LoginAccountController> logger, UserManager<User> userManager, 
-            IJwtToken jwtToken, IWebApiCalling webApiCalling, IConfiguration configuration, IDbService dbService)
+            IJwtToken jwtToken, IWebApiCalling webApiCalling, IConfiguration configuration, IDbService dbService, IApiURL apiURL)
         {
             _logger = logger;
             _userManager = userManager;
@@ -29,6 +30,7 @@ namespace SvcAccount.Controllers
             _webApiCalling = webApiCalling;
             _configuration = configuration;
             _dbService = dbService;
+            _apiURL = apiURL;
         }
 
         [HttpPost("LoginAcc", Name = "LoginAcc")]
@@ -86,8 +88,9 @@ namespace SvcAccount.Controllers
                     authoAcc.UserID = UserDetails.UserID;
                     authoAcc.Name = UserDetails.Name;
 
+                    
                     //Get Company Data
-                    string url = _configuration["ApiURL:GetCompanyByUsername"];
+                    string url = await _apiURL.GetApiURL("GetCompanyByUsername");
                     HttpResponseMessage requestResult = await _webApiCalling.RequestApi(HttpMethod.Post,
                                     url, userName, Encoding.UTF8, "application/json");
 
