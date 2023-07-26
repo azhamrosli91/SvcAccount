@@ -25,6 +25,7 @@ builder.Services.AddScoped<IImageConvert, ImageConverter>();
 builder.Services.AddScoped<IJwtToken, JWTToken>();
 builder.Services.AddScoped<IApiURL, ApiURLRepo>();
 builder.Services.AddScoped<IDbService, DBContext>();
+builder.Services.AddScoped<IDEAddress, AddressRepo>();
 
 var connectionString = builder.Configuration.GetConnectionString("Companydb");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

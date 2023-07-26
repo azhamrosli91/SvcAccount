@@ -7,6 +7,8 @@ using libMasterObject;
 using System.Text;
 using Newtonsoft.Json;
 using libMasterLibaryApi.Models;
+using Newtonsoft.Json.Linq;
+using System.Web;
 
 namespace SvcAccount.Controllers
 {
@@ -44,11 +46,26 @@ namespace SvcAccount.Controllers
                 if (user == null)
                     return BadRequest("#F00 Invalid username or password");
 
-                bool isConfirm = await _userManager.IsEmailConfirmedAsync(user);
+                //bool isConfirm = await _userManager.IsEmailConfirmedAsync(user);
 
-                if (!isConfirm)
-                    return BadRequest("Email not verify, please check out your email.");
+                //if (!isConfirm) {
+                //    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
+                //    var requestBody = new EmailValidate
+                //    {
+                //        UserID = returnID,
+                //        Name = HttpUtility.HtmlEncode(value.Name),
+                //        UserEmail = HttpUtility.HtmlEncode(value.Email.Trim()),
+                //        Token = token,
+                //        DateTimeExp = DateTime.Now.AddDays(2),
+                //    };
+
+                //    HttpResponseMessage requestResult = await _webApiCalling.RequestApi(HttpMethod.Post,
+                //        await _apiURL.GetApiURL("EmailVerify"), requestBody, Encoding.UTF8, "application/json");
+
+                //    return BadRequest("Email not verify, please check out your email.");
+
+                //}
 
                 bool result = await _userManager.CheckPasswordAsync(user, value.Password);
                 if (result == true)
@@ -81,8 +98,30 @@ namespace SvcAccount.Controllers
                     repoData.Query = "select * from usr_user_details where email=@email";
                     repoData.Param = new { email = value.Email };
                     USR_User_Details UserDetails = await _dbService.GetAsync<USR_User_Details>(repoData);
-                    if (User == null) {
+                    if (UserDetails == null) {
                         return BadRequest("#F01 Invalid username or password");
+                    }
+
+                    bool isConfirm = await _userManager.IsEmailConfirmedAsync(user);
+
+                    if (!isConfirm)
+                    {
+                        var tokenEmail = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                        var requestBody = new EmailValidate
+                        {
+                            UserID = UserDetails.UserID,
+                            Name = HttpUtility.HtmlEncode(UserDetails.Name),
+                            UserEmail = HttpUtility.HtmlEncode(value.Email.Trim()),
+                            Token = tokenEmail,
+                            DateTimeExp = DateTime.Now.AddDays(2),
+                        };
+
+                        HttpResponseMessage requestEmailVerify = await _webApiCalling.RequestApi(HttpMethod.Post,
+                            await _apiURL.GetApiURL("EmailVerify"), requestBody, Encoding.UTF8, "application/json");
+
+                        return BadRequest("Email not verify, please check out your email.");
+
                     }
 
                     authoAcc.UserID = UserDetails.UserID;

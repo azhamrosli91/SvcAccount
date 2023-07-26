@@ -89,8 +89,8 @@ namespace SvcAccount.Controllers
             }
 
         }
-        [HttpPost("ResetPassword", Name = "ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPassword value) {
+        [HttpPost("ChangePassword", Name = "ChangePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ResetPassword value) {
             try
             {
                 if (string.IsNullOrEmpty(value.Email)) return BadRequest("Invalid email address");
@@ -107,7 +107,7 @@ namespace SvcAccount.Controllers
 
                 if (result.Succeeded)
                 {
-                    return Ok();
+                    return Ok(result);
                 }
                 else {
                     return BadRequest("#F02 Failed to reset password.");
